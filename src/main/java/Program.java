@@ -1,10 +1,13 @@
 import java.util.Scanner;
 import filetools.*;
 
+// Main program and UI class
 public class Program {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Manipulator fileManipulator = new Manipulator("src/main/resources");
+        String resourcesPath = System.getProperty("user.dir") + "/src/main/resources"; 
+        System.out.println(resourcesPath);
+        Manipulator fileManipulator = new Manipulator(resourcesPath);
         Logger logger = new Logger("src/main/logs/log.txt");
         System.out.println("Welcome to File System Manager");
         while (true) {
@@ -31,22 +34,41 @@ public class Program {
                     fileManipulator.listFilesByType(secondaryCommand);
                 }                
             } else if (mainCommand == 3) {
+                // This will work with other possible text files in resources folder besides just the Dracula.txt
                 System.out.println("Enter name of the text file to be examined (for example, \"Dracula.txt\"):");
                 String filename = scanner.nextLine();
                 System.out.println("Information about the txt file:");
-                fileManipulator.printFileInfo(filename);
-                System.out.println("Enter a word to search for it in the file or 0 to return to main menu:");
-                String secondaryCommand = scanner.nextLine();
-                if (secondaryCommand.equals("0")) {
-                    break;
-                } else {
-                    int wordOccurrences = fileManipulator.countWordOccurrences(filename, secondaryCommand);
-                    if (wordOccurrences != -1) {
-                        System.out.println("The word " + secondaryCommand + " appears " + wordOccurrences + " times.");
-                    }                    
-                }                
+                // The method returns a boolean so that it won't try the other methods if the file is not found or can't be read.
+                if (fileManipulator.printFileSize(filename)) {
+                    fileManipulator.printFileLineCount(filename);
+                    System.out.println("Enter a word to search for it in the file or 0 to return to main menu:");
+                    String secondaryCommand = scanner.nextLine();
+                    if (secondaryCommand.equals("0")) {
+                        break;
+                    } else {
+                        long time1 = System.currentTimeMillis();
+                        int wordOccurrences = fileManipulator.countWordOccurrences(filename, secondaryCommand);
+                        long time2 = System.currentTimeMillis();
+                        long executionTime = time2 - time1;
+                        if (wordOccurrences != -1) {
+                            System.out.println("The word " + secondaryCommand + " appears " + wordOccurrences + " times.");
+                            logger.logResults(secondaryCommand, wordOccurrences, executionTime);
+                        }
+
+                        // Uncomment the following to test and compare the optimized search method
+                        // time1 = System.currentTimeMillis();
+                        // wordOccurrences = fileManipulator.fastSearch(filename, secondaryCommand);
+                        // time2 = System.currentTimeMillis();
+                        // executionTime = time2 - time1;
+                        // if (wordOccurrences != -1) {
+                        //     System.out.println("The word " + secondaryCommand + " appears " + wordOccurrences + " times.");
+                        //     logger.logResults(secondaryCommand, wordOccurrences, executionTime);
+                        // }
+                    }
+                }                   
             }
         }
         scanner.close();
+        logger.closeLogger();
     }
 }
