@@ -15,4 +15,4 @@ Following screenshot shows the commands used in:
 - creating the JAR file
 - running the JAR file
 
-![alt text](https://gitlab.com/group-mikkoluukko/filemanager/-/raw/master/screenshot.jpg)
+![screenshot](https://github.com/mikkoluukko/filemanager/blob/master/screenshot.jpg)
